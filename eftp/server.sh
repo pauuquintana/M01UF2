@@ -74,7 +74,7 @@ echo "(16) Store & Send"
 
 if [ "$DATA" == "" ]
 then
-	echo "ERROR 4: BAD FILE NAME PREFIX"
+	echo "ERROR 4: EMPTY DATA"
 	sleep 1
 	echo "KO_DATA" | nc $CLIENT $PORT
 	exit 4
