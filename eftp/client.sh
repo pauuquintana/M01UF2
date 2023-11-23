@@ -1,8 +1,8 @@
 #!/bin/bash
 
-IP=`ip address | grep inet | grep enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
+#IP=`ip address | grep inet | grep enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
 
-echo $IP
+#echo $IP
 
 SERVER="localhost"
 PORT="3333"
@@ -36,5 +36,42 @@ DATA=`nc -l -p $PORT -w 0`
 
 echo $DATA
 
+echo "(9) Test"
 
+if ["$DATA" != "OK_HANDSHAKE"]
+then 
+	echo "ERROR 2: BAD HANDSHAKE"
+	exit 2
+fi
 
+echo "(10) Send"
+
+echo "FILE_NAME fary1.txt" | nc $SERVER $PORT
+
+echo "(11) Listen"
+
+DATA=`nc -l -p $PORT -w 0`
+
+echo $DATA
+
+echo "(14) Test & Send"
+if [ "$DATA" != "OK_FILE_NAME"]
+then
+	echo "ERROR 3: WRONG FILE NAME"
+	exit 3
+fi
+sleep 1
+
+cat imgs/fary1.txt | nc $SERVER $PORT
+echo "(15) Listen"
+
+DATA=`nc -l -p $PORT -w 0`
+
+if [ "$DATA" != "OK_DATA" ]
+then 
+	echo "ERROR 4: BAD DATA"
+	exit 4
+fi
+
+echo "FIN"
+exit 0
