@@ -44,8 +44,11 @@ fi
 
 echo "(10) Send"
 
+FILE="fary1.txt"
+MD5=`echo "$FILE" | md5sum | cut -d " " -f 1`
+
 sleep 1
-echo "FILE_NAME fary1.txt" | nc $SERVER $PORT
+echo "FILE_NAME $FILE $MD5" | nc $SERVER $PORT
 
 echo "(11) Listen"
 
@@ -72,5 +75,13 @@ then
 	exit 4
 fi
 
+echo "(18) Send"
+FILE_MD5=`cat $FILE | md5sum | cut -d " " -f 1`
+
+echo "FILE_MD5"
+sleep 1
+echo "FILE_MD5 $FILE_MD5" | nc $SERVER $PORT
+
+if [ "$DATA" != "OK_FILE_NAME" ]
 echo "FIN"
 exit 0

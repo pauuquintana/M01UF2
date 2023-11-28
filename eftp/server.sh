@@ -54,6 +54,7 @@ DATA=`nc -l -p $PORT -w $TIMEOUT`
 echo "(12) Test & Store & Send"
 
 PREFIX=`echo $DATA | cut -d " " -f 1`
+
 if [ "$PREFIX" != "FILE_NAME" ]
 then 
 	echo "ERROR 3: BAD FILE NAME PREFIX"
@@ -69,11 +70,17 @@ sleep 1
 echo "OK_FILE_NAME" | nc $CLIENT $PORT
 echo $FILE_NAME
 
+
 echo "(13) Listen"
 
-DATA=`nc -l -p $PORT -w $TIMEOUT`
+nc -l -p $PORT -w $TIMEOUT > inbox/$FILE_NAME
 
 echo "(16) Store & Send"
+
+DATA=`cat inbox/$FILE_NAME`
+
+INFO_FILE=`cat $FILE_NAME |wc -w`
+
 
 if [ "$DATA" == "" ]
 then
@@ -83,10 +90,18 @@ then
 	exit 4
 fi
 
-echo $DATA > inbox/$FILE_NAME
-
 sleep 1
 echo "OK_DATA" | nc $CLIENT $PORT
+
+echo "(17) Listen"
+
+DATA=`nc -l -p $PORT -w $TIMEOUT`
+
+echo "(20) Test & Send"
+
+
+
+
 
 echo "FIN"
 exit 0
