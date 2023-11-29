@@ -99,9 +99,27 @@ DATA=`nc -l -p $PORT -w $TIMEOUT`
 
 echo "(20) Test & Send"
 
+PREFIX=echo $DATA | cut -d " " -f 1
 
+if [ "$PREFIX" != "FILE_MD5" ]
+then
+    echo "BAD_PREFIX"
+    sleep 1
+    echo "KO_PREFIX" | nc $CLIENT $PORT
+fi
 
+sleep 1
+echo "OK_PREFIX" | nc $CLIENT $PORT
 
+FILE_MD5_CLIENT=echo $DATA | cut -d " " -f 2
+FILE_MD5_SERVER=cat $DATA_FILE | md5sum | cut -d " " -f 1
+
+if [ $FILE_MD5_CLIENT != $FILE_MD5_SERVER ]
+then
+    echo "KO_FILE_MD5"
+    sleep 1
+    echo "KO_FILE_MD5" | nc $CLIENT $PORT
+fi
 
 echo "FIN"
 exit 0
