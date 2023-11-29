@@ -82,6 +82,7 @@ echo "FILE_MD5"
 sleep 1
 echo "FILE_MD5 $FILE_MD5" | nc $SERVER $PORT
 
-if [ "$DATA" != "OK_FILE_NAME" ]
+echo "(19) Listen"
+DATA=`nc -l -p $PORT -w $TIMEOUT`
 echo "FIN"
 exit 0
