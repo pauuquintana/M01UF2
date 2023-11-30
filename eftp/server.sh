@@ -10,16 +10,27 @@ echo "(0) Listen"
 
 DATA=`nc -l -p $PORT -w $TIMEOUT`
 
-echo $DATA 
+echo $DATA
 
 echo "(3) Test & Send"
 
-if [ "$DATA" != "EFTP 1.0" ]
+PREFIX=`echo $DATA | cut -d " " -f 1`
+VERSION= `echo $DATA | cut -d " " -f 2`
+
+if [ "$PREFIX $VERSION" != "EFTP 1.0" ]
 then
-sleep 1
+
 echo "ERROR 1: BAD HEADER"
 sleep 1
-echo "KO_HEADER" | nc $CLIENT $PORT 
+#echo "KO_HEADER" | nc $CLIENT $PORT 
+exit 1
+fi
+
+CLIENT=`echo $DATA | cut -d " " -f 3`
+
+if [ "$CLIENT" == " "]
+then 
+echo "ERROR: NO IP"
 exit 1
 fi
 
@@ -111,8 +122,8 @@ fi
 sleep 1
 echo "OK_PREFIX" | nc $CLIENT $PORT
 
-FILE_MD5_CLIENT=echo $DATA | cut -d " " -f 2
-FILE_MD5_SERVER=cat $DATA_FILE | md5sum | cut -d " " -f 1
+FILE_MD5_CLIENT=`echo $DATA | cut -d " " -f 2`
+FILE_MD5_SERVER=`cat $INFO_FILE | md5sum | cut -d " " -f 1`
 
 if [ $FILE_MD5_CLIENT != $FILE_MD5_SERVER ]
 then
@@ -120,6 +131,8 @@ then
     sleep 1
     echo "KO_FILE_MD5" | nc $CLIENT $PORT
 fi
+
+echo "OK_FILE_MD5" | nc $CLIENT $PORT
 
 echo "FIN"
 exit 0

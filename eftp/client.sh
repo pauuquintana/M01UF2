@@ -1,7 +1,7 @@
 #!/bin/bash
-##IP=`ip address | grep inet | grep -i enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
+IP=`ip address | grep inet | grep -i enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
 
-SERVER="localhost"
+SERVER="./client.sh 10.65.0.57"
 PORT="3333"
 TIMEOUT="1"
 
@@ -9,7 +9,7 @@ echo "Cliente de EFTP"
 
 echo "(1) Send"
 
-echo "EFTP 1.0" | nc $SERVER $PORT
+echo "EFTP 1.0 $IP" | nc $SERVER $PORT
 
 echo "(2) Listen"
 
@@ -84,5 +84,14 @@ echo "FILE_MD5 $FILE_MD5" | nc $SERVER $PORT
 
 echo "(19) Listen"
 DATA=`nc -l -p $PORT -w $TIMEOUT`
+
+echo "(21) Test"
+
+if [ "$DATA" != "OK_FILE_MD5" ]
+then
+	echo "ERROR: FILE MD5"
+	exit 5
+fi
+
 echo "FIN"
 exit 0
