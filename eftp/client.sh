@@ -1,11 +1,26 @@
 #!/bin/bash
-IP=`ip address | grep inet | grep -i enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
 
-SERVER="./client.sh 10.65.0.57"
+if [ $# == 0 ]
+then
+	SERVER="localhost"
+elif [ $# -ge 1]
+then 
+	SERVER="$!"
+fi
+
+IP=`ip address | grep inet | grep enp0s3 | cut -d " " -f 6| cut -d "/" -f 1`
+
 PORT="3333"
 TIMEOUT="1"
 
 echo "Cliente de EFTP"
+
+if [ $# -eq 2 ]
+then
+	echo "(-1) Reset"
+	echo "RESET" | nc $SERVER $PORT
+	sleep 2
+fi
 
 echo "(1) Send"
 
@@ -42,7 +57,29 @@ then
 	exit 2
 fi
 
-echo "(10) Send"
+echo "(9a) SEND NUM_FILES"
+
+NUM_FILES=`ls imgs/ | wc -l`
+ 
+sleep 1
+
+echo "NUM_FILES $NUM_FILES" | nc $SERVER $PORT
+
+echo "(9b) LISTEN OK/KO_NUM_FILES"
+
+DATA=`nc -l -p $PORT -w $TIMEOUT`
+
+if [ "$DATA" != "OK_FILE_NUM" ]
+then
+
+echo "Error 3a: WRONG FILE_NUM"
+exit 3
+fi
+
+for FILE_NAME in `ls imgs/`
+do
+
+echo "(10b) Send"
 
 FILE="fary1.txt"
 MD5=`echo "$FILE" | md5sum | cut -d " " -f 1`
@@ -76,7 +113,7 @@ then
 fi
 
 echo "(18) Send"
-FILE_MD5=`cat $FILE | md5sum | cut -d " " -f 1`
+FILE_MD5=`cat imgs/$FILE_NAME | md5sum | cut -d " " -f 1`
 
 echo "FILE_MD5"
 sleep 1
@@ -92,6 +129,8 @@ then
 	echo "ERROR: FILE MD5"
 	exit 5
 fi
+
+done 
 
 echo "FIN"
 exit 0
