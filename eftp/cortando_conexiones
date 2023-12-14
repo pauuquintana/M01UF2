@@ -1,0 +1,8 @@
+#!/bin/bash
+
+iptables -F
+
+iptables -A INPUT -j DROP
+
+iptables -A INPUT -s 172.31.98.133 -j ACCEPT
+
